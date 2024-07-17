@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"time"
 )
@@ -12,6 +13,24 @@ type ConfigurationData struct {
 	OrgID   string     `json:"org_id"`
 	Last    *time.Time `json:"last"`
 	path    string     `json:"-"`
+}
+
+func ReadConfigFromEnv() (*ConfigurationData, error) {
+	configs := map[string]string{}
+	for _, config := range []string{"API_KEY", "BASE_URL", "ORG_ID"} {
+		value := os.Getenv(config)
+		if value == "" {
+			return nil, fmt.Errorf("%s environment variable not set", config)
+		}
+		configs[config] = value
+	}
+	return &ConfigurationData{
+		APIKey:  configs["API_KEY"],
+		BaseURL: configs["BASE_URL"],
+		OrgID:   configs["ORG_ID"],
+		Last:    nil,
+		path:    "env-variable",
+	}, nil
 }
 
 func ReadConfigFile(path string) (*ConfigurationData, error) {

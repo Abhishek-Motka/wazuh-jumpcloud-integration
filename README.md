@@ -67,6 +67,18 @@ Add the following to the `ossec.conf` file.  Change any paths if you customized 
 </wodle>
 ```
 
+If you want to read config from environment variable, use below content to create `ossec.conf` file
+```xml
+<wodle name="command">
+  <disabled>no</disabled>
+  <tag>jumpcloud</tag>
+  <command>/bin/bash -c "/opt/jumpcloud/wazuh-jumpcloud-integration env /opt/jumpcloud/output.log"</command>
+  <interval>5m</interval>
+  <ignore_output>yes</ignore_output>
+  <run_on_start>yes</run_on_start>
+</wodle>
+```
+
 Add a block to the `ossec.conf` file to configure the JumpCloud log file.  This instructs Wazuh to ingest the logs emitted by the integration
 ```xml
 <localfile>

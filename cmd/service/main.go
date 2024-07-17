@@ -12,21 +12,33 @@ func main() {
 		fmt.Println("Expected path to config file as argument but no path was provided.  Usage: wazuh-jumpcloud-integration <path to config file>.json <path to log file>")
 		os.Exit(1)
 	}
-	conf, err := pkg.ReadConfigFile(os.Args[1])
-	if err != nil {
-		fmt.Println("Error reading config file: ", err)
-		os.Exit(1)
-	}
+
+	conf := readConfig(os.Args[1])
 	jcAPI := pkg.NewJumpCloudAPI(pkg.NewJumpCloudAPIOptions{
 		APIKey:  conf.APIKey,
 		BaseURL: conf.BaseURL,
 		OrgID:   conf.OrgID,
 	})
-	err = pkg.RunService(conf, jcAPI, os.Args[2])
+	err := pkg.RunService(conf, jcAPI, os.Args[2])
 	if err != nil {
 		fmt.Println("Error fetching events from JumpCloud API: ", err)
 		os.Exit(1)
 	}
 	fmt.Println("Successfully ran JumpCloud event service")
 	return
+}
+
+func readConfig(path string) *pkg.ConfigurationData {
+	var conf *pkg.ConfigurationData
+	var err error
+	if path == "env" {
+		conf, err = pkg.ReadConfigFromEnv()
+	} else {
+		conf, err = pkg.ReadConfigFile(path)
+	}
+	if err != nil {
+		fmt.Println("Error reading config file: ", err)
+		os.Exit(1)
+	}
+	return conf
 }
